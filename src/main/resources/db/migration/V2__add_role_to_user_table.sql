@@ -1,0 +1,1 @@
+alter table _user add role varchar(10);
