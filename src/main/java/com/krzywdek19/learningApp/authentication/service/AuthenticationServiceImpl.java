@@ -6,7 +6,7 @@ import com.krzywdek19.learningApp.jwt.JWTService;
 import com.krzywdek19.learningApp.request.SignInRequest;
 import com.krzywdek19.learningApp.request.SignUpRequest;
 import com.krzywdek19.learningApp.response.JwtAuthenticationResponse;
-import com.krzywdek19.learningApp.user.UserNotFoundException;
+import com.krzywdek19.learningApp.exception.UserNotFoundException;
 import com.krzywdek19.learningApp.user.UserRepository;
 import com.krzywdek19.learningApp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     private final JWTService jwtService;
 
     public UserDTO signUp(SignUpRequest request) throws NameIsTakenException {
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         return userService.createUser(request);
     }
 

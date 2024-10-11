@@ -1,4 +1,12 @@
 package com.krzywdek19.learningApp.request;
 
-public record SignUpRequest(String username, String email, String password){
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@AllArgsConstructor
+@Data
+public class SignUpRequest{
+    private String email;
+    private String username;
+    private String password;
 }

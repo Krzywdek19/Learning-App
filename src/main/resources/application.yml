@@ -3,3 +3,7 @@ spring:
     include: local
   application:
     name: learning-app
+logging:
+  level:
+    org:
+      springframework: debug
