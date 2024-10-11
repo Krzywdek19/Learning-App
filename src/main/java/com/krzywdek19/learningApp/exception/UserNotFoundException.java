@@ -1,4 +1,4 @@
-package com.krzywdek19.learningApp.user;
+package com.krzywdek19.learningApp.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String username) {
