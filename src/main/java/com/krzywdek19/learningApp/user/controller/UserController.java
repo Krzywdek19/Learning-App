@@ -1,11 +1,13 @@
 package com.krzywdek19.learningApp.user.controller;
 
+import com.krzywdek19.learningApp.exception.ExceptionHandler;
 import com.krzywdek19.learningApp.exception.IllegalInvokeException;
 import com.krzywdek19.learningApp.exception.InvalidPasswordException;
 import com.krzywdek19.learningApp.exception.NameIsTakenException;
 import com.krzywdek19.learningApp.request.ChangePasswordRequest;
 import com.krzywdek19.learningApp.request.ChangeUsernameRequest;
 import com.krzywdek19.learningApp.response.ApiResponse;
+import com.krzywdek19.learningApp.response.GeneralApiResponse;
 import com.krzywdek19.learningApp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,9 @@ public class UserController {
             var user = userService.getCurrentUser();
             return ResponseEntity
                     .status(200)
-                    .body(new ApiResponse("Current user", user));
+                    .body(new GeneralApiResponse("Current user", user));
         } catch (IllegalInvokeException e) {
-            return handleExceptionCausedByUser(e);
+            return ExceptionHandler.handleExceptionCausedByUser(e);
         }
     }
 
@@ -34,7 +36,7 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUsers(){
         return ResponseEntity
                 .status(200)
-                .body(new ApiResponse("All users", userService.findAllUsers()));
+                .body(new GeneralApiResponse("All users", userService.findAllUsers()));
     }
 
     @PatchMapping("/username")
@@ -43,9 +45,9 @@ public class UserController {
             String jwt = userService.changeUsernameForCurrentUser(request);
             return ResponseEntity
                     .status(200)
-                    .body(new ApiResponse("Username successfully changed", jwt));
+                    .body(new GeneralApiResponse("Username successfully changed", jwt));
         } catch (NameIsTakenException | IllegalInvokeException e) {
-            return handleExceptionCausedByUser(e);
+            return ExceptionHandler.handleExceptionCausedByUser(e);
         }
     }
 
@@ -56,9 +58,9 @@ public class UserController {
             String jwt = userService.changePasswordForCurrentUser(request);
             return ResponseEntity
                     .status(200)
-                    .body(new ApiResponse("Password successfully changed",jwt));
+                    .body(new GeneralApiResponse("Password successfully changed",jwt));
         } catch (IllegalInvokeException | InvalidPasswordException e) {
-            return handleExceptionCausedByUser(e);
+            return ExceptionHandler.handleExceptionCausedByUser(e);
         }
     }
 
@@ -68,15 +70,9 @@ public class UserController {
             userService.deleteCurrentUser(password);
             return ResponseEntity
                     .status(204)
-                    .body(new ApiResponse("Current user successfully deleted",null));
+                    .body(new GeneralApiResponse("Current user successfully deleted",null));
         } catch (IllegalInvokeException e) {
-            return handleExceptionCausedByUser(e);
+            return ExceptionHandler.handleExceptionCausedByUser(e);
         }
-    }
-
-    private static ResponseEntity<ApiResponse> handleExceptionCausedByUser(Exception e) {
-        return ResponseEntity
-                .status(400)
-                .body(new ApiResponse(e.getMessage(), null));
     }
 }
