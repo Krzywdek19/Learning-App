@@ -8,7 +8,7 @@ import com.krzywdek19.learningApp.request.UpdateLearningKitRequest;
 import java.util.List;
 
 public interface LearningKitService {
-    LearningKitDTO getLearningKitById(long id);
+    LearningKitDTO getLearningKitById(long id) throws IllegalInvokeException;
     List<LearningKitDTO> getAllLearningKits();
     List<LearningKitDTO> getCurrentUserLearningKits() throws IllegalInvokeException;
     LearningKitDTO createLearningKit(CreateLearningKitRequest request) throws IllegalInvokeException;

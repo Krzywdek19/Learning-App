@@ -70,7 +70,7 @@ public class UserController {
             userService.deleteCurrentUser(password);
             return ResponseEntity
                     .status(204)
-                    .body(new GeneralApiResponse("Current user successfully deleted",null));
+                    .build();
         } catch (IllegalInvokeException e) {
             return ExceptionHandler.handleExceptionCausedByUser(e);
         }
