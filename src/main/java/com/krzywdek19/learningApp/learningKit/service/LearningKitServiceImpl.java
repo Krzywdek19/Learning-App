@@ -2,6 +2,7 @@ package com.krzywdek19.learningApp.learningKit.service;
 
 import com.krzywdek19.learningApp.dto.LearningKitDTO;
 import com.krzywdek19.learningApp.exception.IllegalInvokeException;
+import com.krzywdek19.learningApp.exception.InvalidPasswordException;
 import com.krzywdek19.learningApp.exception.ResourceNotFoundException;
 import com.krzywdek19.learningApp.learningKit.LearningKit;
 import com.krzywdek19.learningApp.learningKit.LearningKitMapper;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +38,18 @@ public class LearningKitServiceImpl implements LearningKitService {
                 .orElseThrow(() -> new IllegalInvokeException("Unauthenticated user"));
     }
 
+    private boolean belongsToCurrentUser(User user, LearningKit learningKit) throws IllegalInvokeException {
+        return Objects.equals(learningKit.getOwner().getId(), getCurrentUser().getId());
+    }
+
     @Override
-    public LearningKitDTO getLearningKitById(long id) {
-        return learningKitMapper
-                .learningKitToLearningKitDTO(learningKitRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(LearningKit.class, id)));
+    public LearningKitDTO getLearningKitById(long id) throws IllegalInvokeException {
+        var learningKit = learningKitRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(LearningKit.class, id));
+        if(belongsToCurrentUser(getCurrentUser(), learningKit)){
+            return learningKitMapper
+                    .learningKitToLearningKitDTO(learningKit);
+        }
+        throw new IllegalInvokeException("Unauthenticated access");
     }
 
     @Override
@@ -85,10 +95,14 @@ public class LearningKitServiceImpl implements LearningKitService {
 
     @Override
     public void deleteLearningKitById(long id, String password) throws IllegalInvokeException {
-        if(passwordEncoder.matches(password, getCurrentUser().getPassword())){
-            learningKitRepository
-                    .findById(id)
-                    .ifPresent(learningKitRepository::delete);
+        var learningKit = learningKitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(LearningKit.class, id));
+        if(belongsToCurrentUser(getCurrentUser(), learningKit)){
+            if(passwordEncoder.matches(password, getCurrentUser().getPassword())){
+                learningKitRepository.delete(learningKit);
+                return;
+            }
+            throw new InvalidPasswordException();
         }
+        throw new IllegalInvokeException("Unauthenticated access");
     }
 }
